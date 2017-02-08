@@ -1,0 +1,2 @@
+# Adaptive-Narrative-Mobile2
+The project at hand is around Perceptive Podcasting – this is the idea that a user will be able to play and listen a podcast which will adapt its content in real time according to various external, implicit factors with little to no user input. These factors may include, but are not limited to, the location of the user, the speed they are travelling at, time of day, environmental noise levels and so on.
