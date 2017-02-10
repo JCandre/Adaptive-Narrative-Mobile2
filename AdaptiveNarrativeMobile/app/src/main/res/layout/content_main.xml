@@ -19,13 +19,13 @@
         android:layout_height="match_parent">
 
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/myviewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:overScrollMode="never" />
     </FrameLayout>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/myviewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:overScrollMode="never" />
 
 </RelativeLayout>

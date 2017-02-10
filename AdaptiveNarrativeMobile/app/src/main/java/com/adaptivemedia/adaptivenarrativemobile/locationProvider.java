@@ -27,6 +27,7 @@ public class locationProvider extends AppCompatActivity implements GoogleApiClie
     double longitude, latitude;
     TextView mLatitudeText, mLongitudeText;
 
+
     private GoogleApiClient mClient;
     private LocationCallback mLocationCallback;
     private Context mContext;
@@ -64,7 +65,7 @@ public class locationProvider extends AppCompatActivity implements GoogleApiClie
     }
 
     public void connect() {
-        mClient.connect();
+        //mClient.connect();
     }
 
     public void disconnect() {
@@ -72,6 +73,14 @@ public class locationProvider extends AppCompatActivity implements GoogleApiClie
             LocationServices.FusedLocationApi.removeLocationUpdates(mClient, this);
             mClient.disconnect();
         }
+    }
+
+    public void testON(){
+        mLongitudeText.setText("Works!!!! its on");
+    }
+
+    public void testOFF(){
+        mLongitudeText.setText("Works!!!! its off");
     }
 
     @Override

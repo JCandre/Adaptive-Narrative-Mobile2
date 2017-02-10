@@ -23,9 +23,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.FragmentManager;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     public final static int PAGES = 5;
     // You can choose a bigger number for LOOPS, but you know, nobody will fling
@@ -33,17 +35,38 @@ public class MainActivity extends AppCompatActivity
     public final static int LOOPS = 1000;
     public final static int FIRST_PAGE = PAGES * LOOPS / 2;
 
+    public final static String AUDIO_FILE_NAME = "track.mp3";
+
     public PagerAdapter adapter;
     public ViewPager pager;
     private FragmentManager fragmentManager;
     private boolean viewIsAtHome;
     SwitchPreference locationSwitch;
-    private SharedPreferences sharedPrefs;
+
+    private locationProvider mlocationProvider;
+
+    private OnSharedPreferenceChangeListener listener =
+            new OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                    if (key.equals("location_switch")) {
+                       // myClass.BooleanVariable = prefs.getBoolean("location_switch", true);
+                       locationSendPrefChanged(); // the function you want called
+                    }
+                }
+            };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -85,12 +108,12 @@ public class MainActivity extends AppCompatActivity
         pager.setPageMargin(-500);
 
 
-
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-
     }
 
+    public void locationSendPrefChanged(){
+        //mlocationProvider.testON();
+       // Toast.makeText(this, "Works!", Toast.LENGTH_LONG).show();
+    }
 
 
     @Override
@@ -162,10 +185,6 @@ public class MainActivity extends AppCompatActivity
                 title = "Share";
                 break;
 
-            case R.id.nav_mf_layout:
-                //fragment = new MyFragment();
-                title = "Share";
-                break;
         }
 
         if (fragment != null) {
@@ -194,10 +213,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        //SwitchPreference locationSwitch = (SwitchPreference) findPreference("location_switch");
-
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
+
+
 }

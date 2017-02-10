@@ -29,6 +29,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.adaptivemedia.adaptivenarrativemobile.MainActivity" />
         </activity>
+        <activity
+            android:name=".mediaplayer"
+            android:label="Now Playing">
+            <intent-filter>
+                <action android:name="com.adaptivemedia.adaptivenarrativemobile.mediaplayer" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.adaptivemedia.adaptivenarrativemobile.MainActivity" />
+
+        </activity>
     </application>
 
 </manifest>

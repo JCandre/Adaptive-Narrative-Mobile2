@@ -15,6 +15,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.SwitchPreference;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -23,6 +24,9 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.TextView;
+import android.view.View;
+import android.widget.Toast;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import java.util.List;
 
@@ -39,7 +43,7 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-   // locationProvider mlocationProvider;
+   public static locationProvider mlocationProvider;
    static SharedPreferences mPrefs;
     /**
      * A preference value change listener that updates the preference's summary
@@ -127,6 +131,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
     }
 
     /**
@@ -201,29 +206,43 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("example_text"));
             bindPreferenceSummaryToValue(findPreference("example_list"));
 
-            SwitchPreference locationSwitch = (SwitchPreference) findPreference("location_switch");
-
-            if (locationSwitch != null){
-                locationSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
-                    @Override
-                    public boolean onPreferenceChange(Preference arg0, Object isLocationOnObject) {
-                        boolean isLocationOn = ((Boolean) isLocationOnObject).booleanValue();
-
-                        SharedPreferences.Editor e = mPrefs.edit();
-                        e.putBoolean("location_switch",isLocationOn);
-                        e.commit();
-
-                        if (isLocationOn){
-                           // mlocationProvider.connect();
-                        } else {
-                           // mlocationProvider.disconnect();
-                        }
-
-                        return true;
-                    }
-                });
-            }
+//            SwitchPreference locationSwitch = (SwitchPreference) findPreference("location_switch");
+//            locationSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+//                @Override
+//                    public boolean onPreferenceChange(Preference arg0, Object isLocationOnObject) {
+//
+//                    return true;
+//                }
+//
+//            });
+//            if (locationSwitch != null){
+//                locationSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
+//                    @Override
+//                    public boolean onPreferenceChange(Preference arg0, Object isLocationOnObject) {
+//                        boolean isLocationOn = ((Boolean) isLocationOnObject).booleanValue();
+//
+//                        SharedPreferences.Editor e = mPrefs.edit();
+//                        e.putBoolean("location_switch",isLocationOn);
+//                        e.commit();
+//
+//                        if (isLocationOn){
+//                           // mlocationProvider.connect();
+//                            //mlocationProvider.testON();
+//
+//                            Toast.makeText(getActivity(), "Works!",
+//                                    Toast.LENGTH_LONG).show();
+//                        } else {
+//                           // mlocationProvider.disconnect();
+//                            //mlocationProvider.testOFF();
+//                        }
+//
+//
+//                        return true;
+//                    }
+//                });
+//            }
         }
+
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {

@@ -82,7 +82,10 @@
     <string name="pref_title_vibrate">Vibrate</string>
 
     <!-- Synopsis for podcasts -->
-    <string name ="podcast_breakout">Synopsis: A short two-character audio drama,
+    <string name="podcast_breakout">Breaking Out: A short two-character audio drama,
         one of whom is acted by a text-to-voice synthesiser -
         which uses data to adapt the content to the user\'s context. </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
