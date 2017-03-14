@@ -65,9 +65,9 @@ public class PerceptivePlayer implements MediaPlayer.OnPreparedListener, MediaPl
                             if (!isTtsQueued) {
                                 isTtsQueued = true;
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    tts.speak("Music muted. This is a bit of text to speech!",TextToSpeech.QUEUE_FLUSH,null,null);
+                                    tts.speak("Music muted. Conversation detected.",TextToSpeech.QUEUE_FLUSH,null,null);
                                 } else {
-                                    tts.speak("Music muted. This is a bit of text to speech!", TextToSpeech.QUEUE_FLUSH, null);
+                                    tts.speak("Music muted. Conversation detected.", TextToSpeech.QUEUE_FLUSH, null);
                                 }
                             }
                         }

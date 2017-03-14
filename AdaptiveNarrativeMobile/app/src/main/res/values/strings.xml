@@ -2,6 +2,9 @@
 
     <string name="app_name">AdaptiveNarrativeMobile</string>
 
+    <string name="resume">Get Location</string>
+    <string name="pause">Pause Location Polling</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

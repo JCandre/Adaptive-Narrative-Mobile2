@@ -26,15 +26,14 @@
         android:textSize="18sp" />
 
     <TextView
-        android:text="0.000"
+        android:id="@+id/mLongitudeValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/longText"
-        android:layout_toRightOf="@+id/longText"
-        android:layout_toEndOf="@+id/longText"
         android:layout_marginLeft="50dp"
         android:layout_marginStart="50dp"
-        android:id="@+id/mLongitudeValue"
+        android:layout_toEndOf="@+id/longText"
+        android:layout_toRightOf="@+id/longText"
         android:textSize="18sp" />
 
     <TextView
@@ -49,15 +48,23 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="0.000"
+        android:id="@+id/mLatitudeValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/mLatitudeValue"
-        android:textSize="18sp"
-        android:layout_marginTop="17dp"
-        android:layout_below="@+id/mLongitudeValue"
         android:layout_alignLeft="@+id/mLongitudeValue"
-        android:layout_alignStart="@+id/mLongitudeValue" />
+        android:layout_alignStart="@+id/mLongitudeValue"
+        android:layout_below="@+id/mLongitudeValue"
+        android:layout_marginTop="17dp"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/getLocal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/resume"
+        android:onClick="toggleGPSUpdates"/>
 
 
 </RelativeLayout>

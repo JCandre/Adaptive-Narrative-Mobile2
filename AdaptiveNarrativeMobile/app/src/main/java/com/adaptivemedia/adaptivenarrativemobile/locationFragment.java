@@ -1,18 +1,15 @@
 package com.adaptivemedia.adaptivenarrativemobile;
 
-import android.app.Activity;
-import android.preference.SwitchPreference;
+
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
-import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 /**
  * Created by Joel on 20/01/2017.
@@ -20,19 +17,41 @@ import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 public class locationFragment extends Fragment {
     View myView;
+    TextView mLatitudeText, mLongitudeText;
+    String longText = "0.000";
+    String latText = "0.000";
 
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
         myView = inflater.inflate(R.layout.ldata_layout, container, false);
-
-
-
+        mLongitudeText = (TextView) myView.findViewById(R.id.mLongitudeValue);
+        mLatitudeText = (TextView) myView.findViewById(R.id.mLatitudeValue);
+        mLongitudeText.setText(longText);
+        mLatitudeText.setText(latText);
 
         return myView;
     }
 
+
+    private void updateLong(String data){
+        longText = data;
+        mLongitudeText.setText(data);
+    }
+
+    private void updateLat(String data){
+        latText = data;
+        mLatitudeText.setText(data);
+    }
+
+    public void update(String longTxt, String latTxt){
+        this.updateLong(longTxt);
+        this.updateLat(latTxt);
+    }
 
 }

@@ -1,18 +1,22 @@
 package com.adaptivemedia.adaptivenarrativemobile;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,14 +24,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.FragmentManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     public final static int PAGES = 5;
     // You can choose a bigger number for LOOPS, but you know, nobody will fling
@@ -42,25 +55,46 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager fragmentManager;
     private boolean viewIsAtHome;
     SwitchPreference locationSwitch;
+    SharedPreferences sharedPref;
 
-    private locationProvider mlocationProvider;
 
     private OnSharedPreferenceChangeListener listener =
             new OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                     if (key.equals("location_switch")) {
-                       // myClass.BooleanVariable = prefs.getBoolean("location_switch", true);
-                       locationSendPrefChanged(); // the function you want called
+                       //myClass.BooleanVariable = prefs.getBoolean("location_switch", true);
+                        boolean value = prefs.getBoolean("location_switch", false);
+                        if (value == true){
+                            locationPrefTrue();
+                        } else {
+                            locationPrefFalse();
+                        }
                     }
                 }
             };
+
+    //location provider
+    Button getLocalTogg;
+    protected FusedLocationProviderApi fusedLocationProviderApi;
+    protected Location mLastLocation;
+    protected GoogleApiClient mClient;
+    LocationRequest mLocationRequest;
+    public static final String TAG = "MainActivity";
+    double mlongitude, mlatitude;
+    LocationManager locationManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        getLocalTogg = (Button) findViewById(R.id.getLocal);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        sharedPref = this.getSharedPreferences("pref_general", MODE_PRIVATE);
 
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -107,12 +141,35 @@ public class MainActivity extends AppCompatActivity
         // previous pages will be showed
         pager.setPageMargin(-500);
 
-
+        getLocation();
     }
 
-    public void locationSendPrefChanged(){
-        //mlocationProvider.testON();
-       // Toast.makeText(this, "Works!", Toast.LENGTH_LONG).show();
+    private boolean isLocationEnabled() {
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private boolean checkLocation() {
+        if (!isLocationEnabled())
+            showAlert();
+        return isLocationEnabled();
+    }
+
+
+    public void locationPrefTrue(){
+        Toast.makeText(this, "True", Toast.LENGTH_LONG).show();
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("Polling", true);
+        editor.commit();
+        //mClient.connect();
+    }
+
+    public void locationPrefFalse(){
+        Toast.makeText(this, "False", Toast.LENGTH_LONG).show();
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("Polling", false);
+        editor.commit();
+        //mClient.disconnect();
     }
 
 
@@ -220,5 +277,122 @@ public class MainActivity extends AppCompatActivity
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
+    private void getLocation(){
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(30 * 1000); // 30 second, in milliseconds
+        fusedLocationProviderApi = LocationServices.FusedLocationApi;
+
+        //Create an instance of GoogleAPIClient to make connection with
+        mClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        if (mClient != null) {
+
+        }
+    }
+
+    public void toggleGPSUpdates(View view) {
+        if(!checkLocation())
+            return;
+        Button button = (Button) view;
+
+        boolean polling = sharedPref.getBoolean("Polling", false);
+        if (polling == true){
+            if (button.getText().equals(getResources().getString(R.string.pause))) { //If button string is set to pause
+                button.setText(R.string.resume); //Set button string to resume
+                if (mClient.isConnected()) {
+                    mClient.disconnect();
+                }
+
+            } else {
+
+                mClient.connect();
+                button.setText(R.string.pause);
+            }
+        } else
+        {
+            Toast.makeText(this, "Enable Location Services in app settings", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+
+    @Override
+    public void onConnected(Bundle arg0) {
+        Log.i(TAG, "Location services connected.");
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
+        mlongitude = mLastLocation.getLongitude();
+        mlatitude = mLastLocation.getLatitude();
+
+        if (mLastLocation != null){
+            viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
+        } else {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        //If connection to Google Play services was lost for some reason. Call connect() to
+        // attempt to re-establish the connection.
+        Log.i(TAG, "Connection suspended");
+        mClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in onConnectionFailed.
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mlongitude = location.getLongitude();
+        mlatitude = location.getLatitude();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
+            }
+        });
+
+    }
+
+
+    private void showAlert() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Enable Location")
+                .setMessage("Location disabled'.\nPlease Enable Location to " +
+                        "use this app")
+                .setPositiveButton("Location Settings", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS); //Where in settings to auto send the user to
+                        startActivity(myIntent); //send user to settings
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                });
+        dialog.show();
+    }
+
+
+    //send strings over to locationFragment class
+    public void viewUpdate(String longTxt, String latTxt) {
+        locationFragment frag = (locationFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        if (frag != null) {
+            frag.update(longTxt, latTxt);
+        }
+    }
 
 }
