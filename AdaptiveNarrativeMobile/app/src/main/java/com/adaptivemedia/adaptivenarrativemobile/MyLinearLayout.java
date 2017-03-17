@@ -18,16 +18,12 @@ public class MyLinearLayout extends LinearLayout {
 
     public void setScaleBoth(float scale) {
         this.scale = scale;
-        this.invalidate();    // If you want to see the scale every time you set
-        // scale you need to have this line here,
-        // invalidate() function will call onDraw(Canvas)
-        // to redraw the view for you
+        this.invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // The main mechanism to display scale animation, you can customize it
-        // as your needs
+        // The main mechanism to display scale animation
         int w = this.getWidth();
         int h = this.getHeight();
         canvas.scale(scale, scale, w / 2, h / 2);

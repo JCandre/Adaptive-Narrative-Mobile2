@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -59,13 +61,13 @@ public class MainActivity extends AppCompatActivity
 
 
     private OnSharedPreferenceChangeListener listener =
+            //Listens to changes in the shared preferences for everything in the settings activity/class
             new OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                     if (key.equals("location_switch")) {
-                       //myClass.BooleanVariable = prefs.getBoolean("location_switch", true);
                         boolean value = prefs.getBoolean("location_switch", false);
-                        if (value == true){
+                        if (value == true) {
                             locationPrefTrue();
                         } else {
                             locationPrefFalse();
@@ -74,15 +76,17 @@ public class MainActivity extends AppCompatActivity
                 }
             };
 
-    //location provider
+    //location provider stuff
     Button getLocalTogg;
     protected FusedLocationProviderApi fusedLocationProviderApi;
     protected Location mLastLocation;
     protected GoogleApiClient mClient;
     LocationRequest mLocationRequest;
     public static final String TAG = "MainActivity";
-    double mlongitude, mlatitude;
+    double mlongitude = 0.000;
+    double mlatitude = 0.000;
     LocationManager locationManager;
+    int MY_PERMISSION_ACCESS_FINE_LOCATION = 11;
 
 
     @Override
@@ -144,30 +148,31 @@ public class MainActivity extends AppCompatActivity
         getLocation();
     }
 
+    //check if the device's location providers are enabled
     private boolean isLocationEnabled() {
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)||
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
     private boolean checkLocation() {
         if (!isLocationEnabled())
-            showAlert();
-        return isLocationEnabled();
+            showAlert(); //show alert if no provider is enabled
+        return isLocationEnabled(); //return true or false to caller of method
     }
 
 
-    public void locationPrefTrue(){
-        Toast.makeText(this, "True", Toast.LENGTH_LONG).show();
+    public void locationPrefTrue() {
+        //Toast.makeText(this, "True", Toast.LENGTH_LONG).show();
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("Polling", true);
+        editor.putBoolean("Polling", true); //edit polling boolean in shared preference
         editor.commit();
         //mClient.connect();
     }
 
-    public void locationPrefFalse(){
-        Toast.makeText(this, "False", Toast.LENGTH_LONG).show();
+    public void locationPrefFalse() {
+        //Toast.makeText(this, "False", Toast.LENGTH_LONG).show();
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("Polling", false);
+        editor.putBoolean("Polling", false); //edit polling boolean in shared preference
         editor.commit();
         //mClient.disconnect();
     }
@@ -196,8 +201,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // automatically handle clicks on the buttons.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -216,7 +220,7 @@ public class MainActivity extends AppCompatActivity
         switch (viewId) {
             case R.id.nav_library_layout:
                 fragment = new LibraryFragment();
-                title  = "Library";
+                title = "Library";
                 break;
             case R.id.nav_ldata_layout:
                 fragment = new locationFragment();
@@ -228,17 +232,12 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_settings_layout:
-                Intent settingsIntent = new Intent(this,SettingsActivity.class);
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 break;
 
             case R.id.nav_share:
-                //fragment = new helpFragment();
-                title = "Share";
-                break;
-
-            case R.id.nav_send:
-                //fragment = new helpFragment();
+                //fragment =
                 title = "Share";
                 break;
 
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
-            //ft.addToBackStack(null);
+            ft.addToBackStack(null);
             ft.commit();
         }
 
@@ -277,7 +276,7 @@ public class MainActivity extends AppCompatActivity
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    private void getLocation(){
+    private void getLocation() {
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -297,25 +296,32 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void toggleGPSUpdates(View view) {
-        if(!checkLocation())
+        if (!checkLocation())
             return;
         Button button = (Button) view;
 
         boolean polling = sharedPref.getBoolean("Polling", false);
-        if (polling == true){
+        if (polling == true) {
             if (button.getText().equals(getResources().getString(R.string.pause))) { //If button string is set to pause
                 button.setText(R.string.resume); //Set button string to resume
+                locationManager.removeUpdates(locationListenerGPS); //Stop polling for current locationListenerGPS
                 if (mClient.isConnected()) {
                     mClient.disconnect();
                 }
 
             } else {
+                //Permissions check for android 23+
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                            MY_PERMISSION_ACCESS_FINE_LOCATION );
+                }
+                locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER, 5 * 60 * 1000, 10, locationListenerGPS); //Provider, min updateTime * minDistance, locationListenerGPS
 
                 mClient.connect();
                 button.setText(R.string.pause);
             }
-        } else
-        {
+        } else {
             Toast.makeText(this, "Enable Location Services in app settings", Toast.LENGTH_LONG).show();
         }
 
@@ -325,12 +331,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(Bundle arg0) {
         Log.i(TAG, "Location services connected.");
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
-        mlongitude = mLastLocation.getLongitude();
-        mlatitude = mLastLocation.getLatitude();
 
+        //Permissions check for android 23+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_FINE_LOCATION  },
+                    MY_PERMISSION_ACCESS_FINE_LOCATION );
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mClient);
         if (mLastLocation != null){
-            viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
+            viewUpdate(String.valueOf(mLastLocation.getLongitude()), String.valueOf(mLastLocation.getLatitude()));
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
@@ -354,18 +363,54 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        mlongitude = location.getLongitude();
-        mlatitude = location.getLatitude();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
-            }
-        });
+
+        if (location != null){
+            mlongitude = location.getLongitude();
+            mlatitude = location.getLatitude();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+        }
 
     }
 
+    private final android.location.LocationListener locationListenerGPS = new android.location.LocationListener() {
+        public void onLocationChanged(Location location) {
+            if (location != null){
+                mlongitude = location.getLongitude();
+                mlatitude = location.getLatitude();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewUpdate(String.valueOf(mlongitude), String.valueOf(mlatitude));
+                    }
+                });
+            }
+        }
 
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
+
+
+    //creates a dialog box that will appear over the app.
     private void showAlert() {
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("Enable Location")

@@ -201,44 +201,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+//            bindPreferenceSummaryToValue(findPreference("example_text"));
+//            bindPreferenceSummaryToValue(findPreference("example_list"));
 
-//            SwitchPreference locationSwitch = (SwitchPreference) findPreference("location_switch");
-//            locationSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-//                @Override
-//                    public boolean onPreferenceChange(Preference arg0, Object isLocationOnObject) {
-//
-//                    return true;
-//                }
-//
-//            });
-//            if (locationSwitch != null){
-//                locationSwitch.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
-//                    @Override
-//                    public boolean onPreferenceChange(Preference arg0, Object isLocationOnObject) {
-//                        boolean isLocationOn = ((Boolean) isLocationOnObject).booleanValue();
-//
-//                        SharedPreferences.Editor e = mPrefs.edit();
-//                        e.putBoolean("location_switch",isLocationOn);
-//                        e.commit();
-//
-//                        if (isLocationOn){
-//                           // mlocationProvider.connect();
-//                            //mlocationProvider.testON();
-//
-//                            Toast.makeText(getActivity(), "Works!",
-//                                    Toast.LENGTH_LONG).show();
-//                        } else {
-//                           // mlocationProvider.disconnect();
-//                            //mlocationProvider.testOFF();
-//                        }
-//
-//
-//                        return true;
-//                    }
-//                });
-//            }
+
         }
 
 

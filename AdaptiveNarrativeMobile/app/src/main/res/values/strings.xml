@@ -18,9 +18,14 @@
     <string name="pref_header_general">General</string>
 
     <string name="pref_title_location_services">Enable Location Services</string>
-    <string name="pref_description_social_recommendations">Allow this app to use the device\'s real world location
-        to adapt the narrative of the podcast.
-    </string>
+    <string name="pref_title_proximity_sensor">Enable Proximity Sensor</string>
+    <string name="pref_title_light_sensor">Enable Light Sensor</string>
+    <string name="pref_title_volume_sensor">Enable Volume Sensor</string>
+
+    <string name="pref_description_social_recommendations">Allow this app to access the device\'s real world location data.</string>
+    <string name="pref_description_proximity_sensor">Allow use of the device\'s proximity sensor.</string>
+    <string name="pref_description_light_sensor">Allow use of the device\'s light sensor.</string>
+    <string name="pref_description_volume_sensor">Allow use of the device\'s volume sensor.</string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
